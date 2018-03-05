@@ -190,9 +190,10 @@ class TabbedPanel extends JFrame
 	            		jointProbability = jointProbability +( String.format("P(%s)", node.getIdentifier()));
 	            	}
 	            }
-	            areaError.append("Joint Probability: \n");
+	            areaError.append("\nJoint Probability: \n");
 	            areaError.append(jointProbability);
-	            generateFactors(visitor.nodes);
+	            areaError.append("\n\nFactors: \n");
+	            areaError.append(generateFactors(visitor.nodes));
     		}
     	
 
@@ -215,9 +216,12 @@ class TabbedPanel extends JFrame
     	return (String.format("%s%s", dependency,coma)); 
     }
     
-    private void generateFactors(ArrayList<Node> nodes){
+    private String generateFactors(ArrayList<Node> nodes){
+    	String factors = "";
     	for(Node node: nodes){
     		node.getFactorAsString();
+    		factors = factors + String.format("Node: %s \nFactor: %s\n", node.getIdentifier(),node.factor.toString());
     	}
+    	return factors;
     }
 }
