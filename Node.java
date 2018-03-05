@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ public class Node {
     String identifier;
 
     Map<Set<String>,Object> probabilities;
+    Map<Set<String>,Object> factor = new HashMap<Set<String>, Object>();
 
     Set<String> dependencies;
 
@@ -64,5 +66,26 @@ public class Node {
     // TODO: Completar
     // public boolean validarCompletudProbabilidades();
 
-    // public Map<Set<String>, Object> getFactorAsString();
+    public void getFactorAsString(){
+    	
+        for (Map.Entry<Set<String>, Object> probability: probabilities.entrySet()){
+        	double real = (double)probability.getValue();
+        	Set<String> setPositive = new LinkedHashSet<String>();
+        	Set<String> setNegative = new LinkedHashSet<String>();
+        	if((dependencies.isEmpty())== false){
+        		setPositive.add(this.identifier);
+        		setNegative.add("!"+this.identifier);
+        		setNegative.addAll(probability.getKey());
+        	}else{
+        		setNegative.add("!"+this.identifier);
+        	}
+        	
+        	setPositive.addAll(probability.getKey());
+        	
+        	factor.put(setPositive, real);
+        	factor.put(setNegative, 1-real);
+        	//System.out.println(factor);
+        }
+        System.out.println(factor);
+    }
 }

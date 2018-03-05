@@ -132,39 +132,7 @@ class TabbedPanel extends JFrame
         // Read and write errors.
         try {
             // Este es el visitador del análisis semántico
-            MyVisitor visitor = new MyVisitor();
-    		visitor.visit(tree);
-
-    		System.out.println(visitor.nodes);
-    		String jointProbability = "";
-            String relations = "";
-            
-            for (Node node: visitor.nodes){
-            	if (node.getDependencies().size()>0){
-            		for (String dependency:node.getDependencies()){
-            			relations = relations +(String.format("%s,", dependency));
-            		}
-            		jointProbability = jointProbability +( String.format("P(%s|%s)", node.getIdentifier(),relations));
-            	}else{
-            		jointProbability = jointProbability +( String.format("P(%s)", node.getIdentifier()));
-            	}
-            }
-            System.out.println("Joint");
-            System.out.println(jointProbability);
-
-    		// TODO: Aplicar paso 4: Recorrer cada nodo para validar si tiene todas las probabilidades necesarias
-    		// para que la red estee completamente descrita
-    		// foreach (node in visitor.nodes) { }
-            for (Node node: visitor.nodes){
-            	int result = (int)Math.pow(2, node.getDependencies().size());
-            	if(node.getProbabilities().size() != result){
-            		System.out.println("NOT COMPLETE");
-            	}
-            	else{
-            		System.out.println("COMPLETE");
-            	}
-            }
-    	
+           
 
             areaError.setText("");
             errors = Files.readAllLines(file, Charset.forName("UTF-8"));
@@ -178,7 +146,55 @@ class TabbedPanel extends JFrame
 
             return 1;
         } catch ( IOException e ) {
-            areaError.setText("No syntactic errors \n ");
+            areaError.setText("No syntactic errors \n\n");
+            
+            MyVisitor visitor = new MyVisitor();
+    		visitor.visit(tree);
+    		
+    		boolean stopExecuting = false;
+    		String descriptionComplete = "";
+    		for (Node node: visitor.nodes){
+            	int result = (int)Math.pow(2, node.getDependencies().size());
+            	if(node.getProbabilities().size() != result){
+            		descriptionComplete = descriptionComplete +
+            				String.format("Node: %s is missing information \n"
+            				+ "Description: \n"
+            				+ "%s", node.getIdentifier(),node.toString());
+            		stopExecuting = true;
+            	}
+            	else{
+            		descriptionComplete = descriptionComplete +
+            				String.format("Node: %s has enough information \n", node.getIdentifier());
+            	}
+            }
+    		areaError.append("Bayesian Network Semantics: \n");
+    		areaError.append(descriptionComplete);
+    		System.out.println(visitor.nodes);
+    		if (stopExecuting == false){
+    			String jointProbability = "";
+	            String relations = "";
+	            for (Node node: visitor.nodes){
+	            	if (node.getDependencies().size()>0){
+	            		int setCounter = 0;
+	            		for (String dependency:node.getDependencies()){
+	            			
+	            			if (setCounter == node.getDependencies().size()-1){
+	            				relations = relations + generateJoint(dependency, "");
+	            			}else{
+	            				relations = relations + generateJoint(dependency, ",");
+	            			}
+	            			setCounter += 1;
+	            		}
+	            		jointProbability = jointProbability +( String.format("P(%s|%s)", node.getIdentifier(),relations));
+	            	}else{
+	            		jointProbability = jointProbability +( String.format("P(%s)", node.getIdentifier()));
+	            	}
+	            }
+	            areaError.append("Joint Probability: \n");
+	            areaError.append(jointProbability);
+	            generateFactors(visitor.nodes);
+    		}
+    	
 
             return 1;
         }
@@ -193,5 +209,15 @@ class TabbedPanel extends JFrame
         } catch (IOException e) {
             System.err.println("Something is wrong.");
         }
+    }
+    
+    private String generateJoint(String dependency, String coma){
+    	return (String.format("%s%s", dependency,coma)); 
+    }
+    
+    private void generateFactors(ArrayList<Node> nodes){
+    	for(Node node: nodes){
+    		node.getFactorAsString();
+    	}
     }
 }
