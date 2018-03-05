@@ -128,18 +128,19 @@ class TabbedPanel extends JFrame
         // De no poner esto, hace un arbol justo a la par
         treePanel.removeAll();
         treePanel.add(treeViewer);
-        
-
-        
-        // Este es el visitador del análisis semántico
-        MyVisitor visitor = new MyVisitor();
-		visitor.visit(tree);
-		System.out.println(visitor.nodes);
-
-		// TODO: Agregar pane para output de código intermedio
 
         // Read and write errors.
         try {
+            // Este es el visitador del análisis semántico
+            MyVisitor visitor = new MyVisitor();
+    		visitor.visit(tree);
+
+    		System.out.println(visitor.nodes);
+
+    		// TODO: Aplicar paso 4: Recorrer cada nodo para validar si tiene todas las probabilidades necesarias
+    		// para que la red estee completamente descrita
+    		// foreach (node in visitor.nodes) { }
+
             areaError.setText("");
             errors = Files.readAllLines(file, Charset.forName("UTF-8"));
             Files.deleteIfExists(file);
