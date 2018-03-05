@@ -136,10 +136,35 @@ class TabbedPanel extends JFrame
     		visitor.visit(tree);
 
     		System.out.println(visitor.nodes);
+    		String jointProbability = "";
+            String relations = "";
+            
+            for (Node node: visitor.nodes){
+            	if (node.getDependencies().size()>0){
+            		for (String dependency:node.getDependencies()){
+            			relations = relations +(String.format("%s,", dependency));
+            		}
+            		jointProbability = jointProbability +( String.format("P(%s|%s)", node.getIdentifier(),relations));
+            	}else{
+            		jointProbability = jointProbability +( String.format("P(%s)", node.getIdentifier()));
+            	}
+            }
+            System.out.println("Joint");
+            System.out.println(jointProbability);
 
     		// TODO: Aplicar paso 4: Recorrer cada nodo para validar si tiene todas las probabilidades necesarias
     		// para que la red estee completamente descrita
     		// foreach (node in visitor.nodes) { }
+            for (Node node: visitor.nodes){
+            	int result = (int)Math.pow(2, node.getDependencies().size());
+            	if(node.getProbabilities().size() != result){
+            		System.out.println("NOT COMPLETE");
+            	}
+            	else{
+            		System.out.println("COMPLETE");
+            	}
+            }
+    	
 
             areaError.setText("");
             errors = Files.readAllLines(file, Charset.forName("UTF-8"));
@@ -149,14 +174,11 @@ class TabbedPanel extends JFrame
                 areaError.append("(" + (i + 1) + "): " + errors.get(i) + "\n");
             }
             
+            
 
             return 1;
         } catch ( IOException e ) {
             areaError.setText("No syntactic errors \n ");
-
-
-            // Testear si no hay errores de ninguna naturaleza, y si no hay
-            // hacer output de código intermedio
 
             return 1;
         }
