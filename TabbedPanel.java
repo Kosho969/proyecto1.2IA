@@ -172,8 +172,9 @@ class TabbedPanel extends JFrame
     		System.out.println(visitor.nodes);
     		if (stopExecuting == false){
     			String jointProbability = "";
-	            String relations = "";
+	            
 	            for (Node node: visitor.nodes){
+	            	String relations = "";
 	            	if (node.getDependencies().size()>0){
 	            		int setCounter = 0;
 	            		for (String dependency:node.getDependencies()){
